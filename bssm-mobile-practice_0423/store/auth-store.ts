@@ -10,11 +10,13 @@ const TOKEN_KEY = 'accessToken';
 const REFRESH_KEY = 'refreshToken';
 
 // TODO 실습 2: 'checking' | 'authenticated' | 'guest' 타입을 정의하고 export하세요
+export type AuthStatus = 'checking' | 'authenticated' | 'guest';
+
 interface AuthState {
     user: User | null;
     accessToken: string | null;
     refreshToken: string | null;
-    // TODO 실습 2: status 필드를 추가하세요
+    status: AuthStatus;
     loading: boolean;
     error: string | null;
 
@@ -32,6 +34,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     accessToken: null,
     refreshToken: null,
     // TODO 실습 2-1: status 초기값을 설정하세요
+    status: 'checking',
     loading: false,
     error: null,
 
@@ -59,6 +62,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 accessToken: res.accessToken,
                 refreshToken: res.refreshToken,
                 // TODO 실습 2-2: status를 'authenticated'로 설정하세요
+                status: 'authenticated',
                 loading: false,
             });
         } catch (err: unknown) {
@@ -87,6 +91,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 accessToken: res.accessToken,
                 refreshToken: res.refreshToken,
                 // TODO 실습 2-3: status를 'authenticated'로 설정하세요
+                status: 'authenticated',
                 loading: false,
             });
         } catch (err: unknown) {
@@ -114,6 +119,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             accessToken: null,
             refreshToken: null,
             // TODO 실습 2-4: status를 'guest'로 설정하세요
+            status: 'guest',
             error: null,
         });
     },
