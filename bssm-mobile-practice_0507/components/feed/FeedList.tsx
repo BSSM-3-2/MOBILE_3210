@@ -1,4 +1,4 @@
-import { FlatList, RefreshControl, StyleSheet } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import Animated, {
     useAnimatedScrollHandler,
     SharedValue,
@@ -6,6 +6,7 @@ import Animated, {
 import { Post } from '@type/Post';
 import { SwipeableFeedPost } from './post/SwipeableFeedPost';
 import { useFeedStore } from '@/store/feed-store';
+import { ErrorBoundary } from '@components/ErrorBoundary';
 
 // Animated.FlatList: Reanimated의 네이티브 이벤트 시스템과 연결된 FlatList
 // — onScroll 핸들러가 JS 브리지 없이 UI 스레드에서 직접 실행됨
@@ -36,7 +37,18 @@ function FeedList({
                 // TODO 4. 각 포스트를 독립 ErrorBoundary로 감싸세요.
                 //         - key={item.id} : 포스트마다 독립 인스턴스를 생성해 에러를 격리합니다.
                 //         - fallback: "이 게시물을 표시할 수 없어요." 텍스트를 postStyles.error 뷰로 표시하세요.
-                <SwipeableFeedPost post={item} onDelete={removePost} />
+                <ErrorBoundary
+                    key={item.id}
+                    fallback={
+                        <View style={postStyles.error}>
+                            <Text style={postStyles.errorText}>
+                                이 게시물을 표시할 수 없어요.
+                            </Text>
+                        </View>
+                    }
+                >
+                    <SwipeableFeedPost post={item} onDelete={removePost} />
+                </ErrorBoundary>
             )}
             showsVerticalScrollIndicator={false}
             onEndReached={onEndReached}
