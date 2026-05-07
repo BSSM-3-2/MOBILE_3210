@@ -1,5 +1,11 @@
 import { useEffect } from 'react';
-import { ActivityIndicator, TouchableOpacity } from 'react-native';
+import {
+    ActivityIndicator,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import NavigationTop from '@components/navigation/NavigationTop';
 import ContentContainer from '@components/container';
 import { FeedList } from '@components/feed/FeedList';
@@ -19,9 +25,19 @@ import Animated, {
 //           내용: 에러 메시지 텍스트 + "다시 시도" 버튼
 //           주의: Error Boundary는 async 에러(fetchFeed 실패)를 잡지 못합니다.
 //                 store의 error 상태를 직접 읽어 UI에 표시해야 합니다.
+function FeedError({ message, onRetry }: { message: string; onRetry: () => void }) {
+    return (
+        <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{message}</Text>
+            <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
+                <Text style={styles.retryText}>다시 시도</Text>
+            </TouchableOpacity>
+        </View>
+    );
+}
 
 export default function HomeScreen() {
-    const { posts, loading, fetchFeed, loadMore } = useFeedStore();
+    const { posts, loading, fetchFeed, loadMore, error } = useFeedStore();
     const router = useRouter();
 
     // scrollY: 스크롤 위치를 UI 스레드에서 직접 추적하는 SharedValue
@@ -78,7 +94,9 @@ export default function HomeScreen() {
 
             {/* TODO 5-2. error가 있고 posts.length === 0이면 FeedError를 표시하세요.
                          그 외: loading 중이면 ActivityIndicator, 아니면 FeedList */}
-            {loading && posts.length === 0 ? (
+            {error && posts.length === 0 ? (
+                <FeedError message={error} onRetry={fetchFeed} />
+            ) : loading && posts.length === 0 ? (
                 <ActivityIndicator style={{ flex: 1 }} />
             ) : (
                 // scrollY를 FeedList에 전달 → useAnimatedScrollHandler가 내부에서 처리
@@ -91,3 +109,28 @@ export default function HomeScreen() {
         </ThemedView>
     );
 }
+
+const styles = StyleSheet.create({
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 32,
+        gap: 12,
+    },
+    errorText: {
+        fontSize: 14,
+        color: '#666',
+    },
+    retryButton: {
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 6,
+        backgroundColor: '#0095F6',
+    },
+    retryText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: '600',
+    },
+});
