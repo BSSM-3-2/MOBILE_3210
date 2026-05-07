@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createPost } from '@/api/content';
@@ -26,8 +26,12 @@ interface SelectedImage {
     type: string;
 }
 
+const isExpoGo = Constants.appOwnership === 'expo';
+
 // 업로드 성공 후 로컬 알림 예약
 async function scheduleUploadNotification(caption: string) {
+    if (isExpoGo) return;
+    const Notifications = await import('expo-notifications');
     const { status } = await Notifications.getPermissionsAsync();
     if (status !== 'granted') return;
 

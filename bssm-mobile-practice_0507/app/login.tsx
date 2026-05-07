@@ -11,6 +11,7 @@ import {
     ActivityIndicator,
     TextInput as RNTextInput,
     Pressable,
+    Button,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -57,6 +58,13 @@ export default function LoginScreen() {
                     <View style={styles.header}>
                         <Text style={styles.logo}>MyFeed</Text>
                     </View>
+                    <Button 
+                        title="Sentry 에러 테스트" 
+                        onPress={() => {
+                            // 이 코드가 실행되는 순간 에러가 발생하고 Sentry로 전송됨
+                            throw new Error("Sentry Test Error: 과제 확인용");
+                        }} 
+                        />
 
                     {/* Form */}
                     <View style={styles.form}>

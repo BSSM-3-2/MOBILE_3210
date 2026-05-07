@@ -7,6 +7,7 @@ import { useFonts } from 'expo-font';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import Constants from 'expo-constants';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -17,25 +18,33 @@ import { ThemedText } from '@components/themed-text';
 import { StyleSheet } from 'react-native';
 import { useAuthStore } from '@/store/auth-store';
 import { usePushRegistration } from '@/hooks/use-push-registration';
-import * as Notifications from 'expo-notifications';
 
+console.log('DSN:', process.env.EXPO_PUBLIC_SENTRY_DSN);
 Sentry.init({
     dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
     environment: __DEV__ ? 'dev' : 'prod',
     tracesSampleRate: 0.1,
-    enabled: !__DEV__,
+    enabled: true
 });
 
-// 포그라운드에서도 알림 배너가 보이도록 설정
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: false,
-        shouldShowBanner: true,
-        shouldShowList: true,
-    }),
-});
+
+const isExpoGo = Constants.appOwnership === 'expo';
+
+async function setupNotificationHandler() {
+    if (isExpoGo) return;
+    const Notifications = await import('expo-notifications');
+    // 포그라운드에서도 알림 배너가 보이도록 설정
+    Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+            shouldShowAlert: true,
+            shouldPlaySound: true,
+            shouldSetBadge: false,
+            shouldShowBanner: true,
+            shouldShowList: true,
+        }),
+    });
+}
+
 
 SplashScreen.preventAutoHideAsync();
 
@@ -50,7 +59,7 @@ function AuthGuard() {
     const segments = useSegments();
     const router = useRouter();
 
-    usePushRegistration();
+    // usePushRegistration();
 
     useEffect(() => {
         // checking 중에는 라우팅하지 않음 — Splash가 유지되는 동안 대기
@@ -69,7 +78,7 @@ function AuthGuard() {
     return null;
 }
 
-export default function RootLayout() {
+export default Sentry.wrap(function RootLayout() {
     const { bootstrap } = useAuthStore();
     const colorScheme = useColorScheme();
     const [loaded] = useFonts({
@@ -83,6 +92,10 @@ export default function RootLayout() {
     // 앱 시작 시 한 번 — SecureStore 토큰 조회 → 서버 검증 → status 결정
     useEffect(() => {
         bootstrap();
+    }, []);
+
+    useEffect(() => {
+        void setupNotificationHandler();
     }, []);
 
     useEffect(() => {
@@ -152,7 +165,7 @@ export default function RootLayout() {
             </ThemeProvider>
         </GestureHandlerRootView>
     );
-}
+});
 
 const styles = StyleSheet.create({
     default: {

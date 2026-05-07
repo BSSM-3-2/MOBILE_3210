@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import { registerPushDevice } from '@/api/push';
@@ -21,6 +21,11 @@ export function usePushRegistration() {
 async function registerDevice() {
     // 실기기가 아니면 Expo push token을 발급받을 수 없음
     if (!Device.isDevice) return;
+
+    // Expo Go에서는 remote push 기능을 사용할 수 없음
+    if (Constants.appOwnership === 'expo') return;
+
+    const Notifications = await import('expo-notifications');
 
     // Android 채널 설정
     if (Platform.OS === 'android') {
