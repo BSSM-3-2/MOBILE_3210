@@ -74,7 +74,7 @@ export default function HomeScreen() {
             <Animated.View style={headerAnimatedStyle}>
                 <ContentContainer isTopElement={true}>
                     <NavigationTop
-                        title='MyFeed'
+                        title='MyFeed v1.1'
                         icon={'layers'}
                         rightButtons={
                             <TouchableOpacity
