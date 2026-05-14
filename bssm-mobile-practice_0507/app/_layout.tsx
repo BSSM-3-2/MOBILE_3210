@@ -20,9 +20,9 @@ import { useAuthStore } from '@/store/auth-store';
 import { usePushRegistration } from '@/hooks/use-push-registration';
 import { ErrorBoundary } from '@components/ErrorBoundary';
 
-console.log('DSN:', process.env.EXPO_PUBLIC_SENTRY_DSN);
+console.log('DSN:', process.env.SENTRY_DSN);
 Sentry.init({
-    dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+    dsn: process.env.SENTRY_DSN,
     environment: __DEV__ ? 'dev' : 'prod',
     tracesSampleRate: 0.1,
     enabled: !__DEV__

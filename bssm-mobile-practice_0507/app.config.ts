@@ -4,7 +4,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ...config,
     name: 'MyFeed',
     slug: 'MyFeed',
+    owner: 'dehgns12',
     version: '1.0.0',
+    runtimeVersion: {
+        policy: 'appVersion',
+    },
+    updates: {
+        url: 'https://u.expo.dev/71f82f33-dc25-4720-9c0e-914a2fd28eab',
+        enabled: true,
+        fallbackToCacheTimeout: 0,
+        checkAutomatically: 'ON_LOAD',
+    },
     orientation: 'portrait',
     icon: './assets/images/icon.png',
     scheme: 'myfeed',
@@ -64,5 +74,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
     extra: {
         apiUrl: process.env.EXPO_PUBLIC_API_URL,
+        eas: {
+            projectId: '71f82f33-dc25-4720-9c0e-914a2fd28eab',
+        },
     },
 });
