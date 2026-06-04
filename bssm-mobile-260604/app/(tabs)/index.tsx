@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     TouchableOpacity,
     View,
     Text,
+    TextInput,
     Pressable,
     StyleSheet,
 } from 'react-native';
@@ -49,6 +50,19 @@ function FeedError({
     );
 }
 
+const searchStyles = StyleSheet.create({
+    input: {
+        marginHorizontal: 16,
+        marginVertical: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 8,
+        backgroundColor: '#efefef',
+        fontSize: 14,
+        fontFamily: Pretendard.regular,
+    },
+});
+
 const feedErrorStyles = StyleSheet.create({
     container: {
         flex: 1,
@@ -89,6 +103,15 @@ export default function HomeScreen() {
     //       import { useFeedPosts } from '@/hooks/useFeedPosts';
     const { posts, loading, error, fetchFeed, loadMore } = useFeedStore();
     const router = useRouter();
+    const [keyword, setKeyword] = useState('');
+
+    const filteredPosts = useMemo(
+        () =>
+            keyword.trim()
+                ? posts.filter(p => p.caption?.includes(keyword))
+                : posts,
+        [posts, keyword],
+    );
 
     // scrollY: 스크롤 위치를 UI 스레드에서 직접 추적하는 SharedValue
     const scrollY = useSharedValue(0);
@@ -142,6 +165,13 @@ export default function HomeScreen() {
                 </ContentContainer>
             </Animated.View>
 
+            <TextInput
+                value={keyword}
+                onChangeText={setKeyword}
+                placeholder='게시물 검색'
+                style={searchStyles.input}
+            />
+
             {/* API 에러 — 피드 목록이 비어있을 때만 전체 에러 화면 표시 */}
             {error && posts.length === 0 ? (
                 <FeedError message={error} onRetry={fetchFeed} />
@@ -150,7 +180,7 @@ export default function HomeScreen() {
             ) : (
                 // scrollY를 FeedList에 전달 → useAnimatedScrollHandler가 내부에서 처리
                 <FeedList
-                    posts={posts}
+                    posts={filteredPosts}
                     onEndReached={loadMore}
                     scrollY={scrollY}
                 />
