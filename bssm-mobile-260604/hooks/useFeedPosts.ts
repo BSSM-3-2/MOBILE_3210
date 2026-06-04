@@ -1,3 +1,4 @@
+import { useMemo, useCallback } from 'react';
 import { useFeedStore } from '@/store/feed-store';
 
 // TODO: 아래 Hook을 완성하세요
@@ -8,10 +9,26 @@ import { useFeedStore } from '@/store/feed-store';
 // 반환해야 하는 값: posts, loading, error, fetchFeed, loadMore
 // 각 값을 selector로 구독하세요 (예: useFeedStore(s => s.posts))
 
-export function useFeedPosts() {
+export function useFeedPosts(keyword: string) {
     const posts = useFeedStore(s => s.posts);
+    const toggleLike = useFeedStore(s => s.toggleLike);
+    const loading = useFeedStore(s => s.loading);
+    const error = useFeedStore(s => s.error);
+    const fetchFeed = useFeedStore(s => s.fetchFeed);
+    const loadMore = useFeedStore(s => s.loadMore);
 
-    // TODO: loading, error, fetchFeed, loadMore도 추가하세요
+    const filteredPosts = useMemo(
+        () =>
+            keyword.trim()
+                ? posts.filter(p => p.caption?.includes(keyword))
+                : posts,
+        [posts, keyword],
+    );
 
-    return { posts };
+    const handleLike = useCallback(
+        (id: string) => toggleLike(id),
+        [toggleLike],
+    );
+
+    return { filteredPosts, handleLike, loading, error, fetchFeed, loadMore };
 }

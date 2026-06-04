@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     TouchableOpacity,
@@ -13,7 +13,7 @@ import ContentContainer from '@components/container';
 import { FeedList } from '@components/feed/FeedList';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedView } from '@components/themed-view';
-import { useFeedStore } from '@/store/feed-store';
+import { useFeedPosts } from '@/hooks/useFeedPosts';
 import { useRouter } from 'expo-router';
 import { Pretendard } from '@/constants/theme';
 import Animated, {
@@ -101,17 +101,9 @@ const feedErrorStyles = StyleSheet.create({
 export default function HomeScreen() {
     // TODO: useFeedStore()를 useFeedPosts() Hook으로 교체하세요 (실습 5)
     //       import { useFeedPosts } from '@/hooks/useFeedPosts';
-    const { posts, loading, error, fetchFeed, loadMore } = useFeedStore();
     const router = useRouter();
     const [keyword, setKeyword] = useState('');
-
-    const filteredPosts = useMemo(
-        () =>
-            keyword.trim()
-                ? posts.filter(p => p.caption?.includes(keyword))
-                : posts,
-        [posts, keyword],
-    );
+    const { filteredPosts, loading, error, fetchFeed, loadMore } = useFeedPosts(keyword);
 
     // scrollY: 스크롤 위치를 UI 스레드에서 직접 추적하는 SharedValue
     const scrollY = useSharedValue(0);
@@ -173,9 +165,9 @@ export default function HomeScreen() {
             />
 
             {/* API 에러 — 피드 목록이 비어있을 때만 전체 에러 화면 표시 */}
-            {error && posts.length === 0 ? (
+            {error && filteredPosts.length === 0 ? (
                 <FeedError message={error} onRetry={fetchFeed} />
-            ) : loading && posts.length === 0 ? (
+            ) : loading && filteredPosts.length === 0 ? (
                 <ActivityIndicator style={{ flex: 1 }} />
             ) : (
                 // scrollY를 FeedList에 전달 → useAnimatedScrollHandler가 내부에서 처리
