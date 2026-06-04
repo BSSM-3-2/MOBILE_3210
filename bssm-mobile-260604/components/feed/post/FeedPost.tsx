@@ -16,6 +16,8 @@ import { useFeedStore } from '@/store/feed-store';
 //         export const FeedPost = React.memo(function FeedPost(...) { ... });
 
 function FeedPost({ post }: { post: Post }) {
+    console.log('FeedPost render:', post.id);
+
     const user = post.author;
 
     // TODO 3: useFeedStore() 전체 구독을 selector로 교체하세요
